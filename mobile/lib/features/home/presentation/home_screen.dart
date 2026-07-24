@@ -1,31 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter/foundation.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  Future<void> _openCamera() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+
+      if (image != null) {
+        debugPrint('Çekilen fotoğrafın yolu: ${image.path}');
+      } else {
+        debugPrint('Fotoğraf çekme işlemi iptal edildi.');
+      }
+    } catch (e) {
+      debugPrint('Kamera açılırken bir hata oluştu: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AI Gym Assistant'),
-      ),
+      appBar: AppBar(title: const Text('AI Gym Assistant')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
               'AI Gym Assistant\'a Hoş Geldiniz',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
-            
-),
+            ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: _openCamera,
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 48,
+                  vertical: 16,
+                ),
                 textStyle: const TextStyle(fontSize: 20),
               ),
               child: const Text('Makine Tara'),
