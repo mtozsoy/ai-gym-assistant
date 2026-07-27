@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
+import '../../../services/api_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,6 +13,13 @@ class HomeScreen extends StatelessWidget {
 
       if (image != null) {
         debugPrint('Çekilen fotoğrafın yolu: ${image.path}');
+
+        // API servisini çağır ve dönen JSON'daki 'machine' alanını yazdır
+        final apiService = ApiService();
+        final response = await apiService.detectMachine();
+        if (response != null && response.containsKey('machine')) {
+          debugPrint('Tespit edilen makine: ${response['machine']}');
+        }
       } else {
         debugPrint('Fotoğraf çekme işlemi iptal edildi.');
       }
