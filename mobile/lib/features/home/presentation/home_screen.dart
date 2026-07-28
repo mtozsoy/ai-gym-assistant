@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
 
         // API servisini çağır ve dönen JSON'daki 'machine' alanını yazdır
         final apiService = ApiService();
-        final response = await apiService.detectMachine();
+        final response = await apiService.detectMachine(image);
         if (response != null && response.containsKey('machine')) {
           debugPrint('Tespit edilen makine: ${response['machine']}');
         }
