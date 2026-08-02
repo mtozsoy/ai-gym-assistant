@@ -25,3 +25,11 @@ Thumbs.db
 backend/uploads/
 *.pt
 runs/
+
+# Datasets and Test Images
+backend/dataset/
+/*.avif
+/*.png
+/*.webp
+/*.jpg
+/*.jpeg
