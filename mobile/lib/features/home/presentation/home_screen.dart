@@ -9,7 +9,7 @@ class HomeScreen extends StatelessWidget {
   Future<void> _openCamera() async {
     try {
       final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
       if (image != null) {
         debugPrint('Çekilen fotoğrafın yolu: ${image.path}');
