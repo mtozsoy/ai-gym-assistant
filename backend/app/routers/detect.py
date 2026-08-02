@@ -14,5 +14,6 @@ async def detect_machine(file: UploadFile = File(...)):
         "message": "Fotoğraf başarıyla işlendi",
         "width": result["width"],
         "height": result["height"],
-        "channels": result["channels"]
+        "channels": result["channels"],
+        "detections": result["detections"]
     }

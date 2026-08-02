@@ -2,12 +2,15 @@ import os
 import shutil
 import cv2
 from fastapi import UploadFile, HTTPException
+from ultralytics import YOLO
 
 # Yüklenen dosyaların kaydedileceği klasör
 UPLOAD_DIR = "uploads"
-
-# Sunucu başlarken klasörün var olduğundan emin oluyoruz
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# YOLOv8n (nano) modelini uygulama başlarken 1 kez yüklüyoruz
+# Model dosyası yoksa otomatik olarak indirecektir
+model = YOLO("yolov8n.pt")
 
 def process_image(file: UploadFile) -> dict:
     # Dosyanın kaydedileceği tam yolu oluşturuyoruz
@@ -21,16 +24,33 @@ def process_image(file: UploadFile) -> dict:
     img = cv2.imread(file_path)
     
     if img is None:
-        # Hatalı/Bozuk dosyayı sunucuda tutmuyoruz
         os.remove(file_path)
         raise HTTPException(status_code=400, detail="Geçersiz fotoğraf formatı veya bozuk dosya.")
         
-    # Resim verilerini alıyoruz
     height, width, channels = img.shape
     
-    # İhtiyacımız olan bilgileri sözlük (dict) olarak geri dönüyoruz
+    # Resmi YOLO modeline gönderip tahmin sonuçlarını alıyoruz
+    results = model(img)
+    
+    detected_objects = []
+    
+    # YOLO'nun döndürdüğü sonuçlardan sınıf adlarını ve güven skorlarını çekiyoruz
+    for result in results:
+        # result.boxes tespit edilen her bir nesnenin kutusunu içerir
+        for box in result.boxes:
+            class_id = int(box.cls[0])           # Sınıf ID'si (örneğin 0)
+            class_name = model.names[class_id]   # Sınıfın gerçek adı (örneğin 'person')
+            confidence = float(box.conf[0])      # Yüzdelik güven skoru (0.0 ile 1.0 arası)
+            
+            detected_objects.append({
+                "name": class_name,
+                "confidence": round(confidence, 3)
+            })
+    
+    # İhtiyacımız olan bilgileri döndürüyoruz
     return {
         "width": width,
         "height": height,
-        "channels": channels
+        "channels": channels,
+        "detections": detected_objects
     }
