@@ -10,7 +10,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # YOLOv8n (nano) modelini uygulama başlarken 1 kez yüklüyoruz
 # Model dosyası yoksa otomatik olarak indirecektir
-model = YOLO("runs/detect/gym_machine_detector/weights/best.pt")
+model = YOLO("runs/detect/gym_machine_detector_v2/weights/best.pt")
 
 def process_image(file: UploadFile) -> dict:
     # Dosyanın kaydedileceği tam yolu oluşturuyoruz
@@ -30,7 +30,7 @@ def process_image(file: UploadFile) -> dict:
     height, width, channels = img.shape
     
     # Resmi YOLO modeline gönderip tahmin sonuçlarını alıyoruz
-    results = model(img, conf=0.6)
+    results = model(img, conf=0.3)
     
     detected_objects = []
     
