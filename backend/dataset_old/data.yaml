@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['Leg Press']
+
+roboflow:
+  workspace: emrullah-mete-ozsoy-s-workspace
+  project: ai-gym-machine-detection
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/emrullah-mete-ozsoy-s-workspace/ai-gym-machine-detection/dataset/2
