@@ -30,7 +30,7 @@ def process_image(file: UploadFile) -> dict:
     height, width, channels = img.shape
     
     # Resmi YOLO modeline gönderip tahmin sonuçlarını alıyoruz
-    results = model(img)
+    results = model(img, conf=0.6)
     
     detected_objects = []
     
