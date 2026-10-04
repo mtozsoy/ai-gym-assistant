@@ -1,30 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter/foundation.dart';
 import '../../../services/api_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String? detectedMachine;
+  double? confidence;
 
   Future<void> _openCamera() async {
     try {
       final ImagePicker picker = ImagePicker();
+
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
       if (image != null) {
         debugPrint('Çekilen fotoğrafın yolu: ${image.path}');
 
-        // API servisini çağır ve dönen JSON'daki 'machine' alanını yazdır
         final apiService = ApiService();
         final response = await apiService.detectMachine(image);
-        if (response != null && response.containsKey('machine')) {
-          debugPrint('Tespit edilen makine: ${response['machine']}');
+
+        if (response != null && response.containsKey('detections')) {
+          final detections = response['detections'] as List;
+
+          if (detections.isNotEmpty) {
+            final bestDetection = detections.reduce(
+              (a, b) => a['confidence'] > b['confidence'] ? a : b,
+            );
+
+            setState(() {
+              detectedMachine = bestDetection['name'];
+              confidence = bestDetection['confidence'];
+            });
+
+            debugPrint(
+              'Tespit edilen makine: $detectedMachine'
+              ' | Güven: ${(confidence! * 100).toStringAsFixed(1)}%',
+            );
+          }
         }
       } else {
-        debugPrint('Fotoğraf çekme işlemi iptal edildi.');
+        debugPrint('Fotoğraf seçme işlemi iptal edildi.');
       }
     } catch (e) {
-      debugPrint('Kamera açılırken bir hata oluştu: $e');
+      debugPrint('Makine taranırken bir hata oluştu: $e');
     }
   }
 
@@ -41,6 +65,9 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
+
+            const SizedBox(height: 30),
+
             ElevatedButton(
               onPressed: _openCamera,
               style: ElevatedButton.styleFrom(
@@ -52,6 +79,24 @@ class HomeScreen extends StatelessWidget {
               ),
               child: const Text('Makine Tara'),
             ),
+
+            if (detectedMachine != null) ...[
+              const SizedBox(height: 30),
+
+              const Text(
+                'Tespit Sonucu',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 10),
+
+              Text(detectedMachine!, style: const TextStyle(fontSize: 20)),
+
+              Text(
+                'Güven: ${(confidence! * 100).toStringAsFixed(1)}%',
+                style: const TextStyle(fontSize: 18),
+              ),
+            ],
           ],
         ),
       ),
